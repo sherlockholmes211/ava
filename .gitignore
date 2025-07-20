@@ -8,4 +8,5 @@ KMS
 .vscode
 *.egg-info
 .pytest_cache
+venv
 .ruff_cache
