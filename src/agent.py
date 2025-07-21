@@ -15,7 +15,7 @@ from livekit.agents import (
 )
 from livekit.agents.llm import function_tool
 from livekit.agents.voice import MetricsCollectedEvent
-from livekit.plugins import cartesia, deepgram, noise_cancellation, openai, silero
+from livekit.plugins import rime, assemblyai, noise_cancellation, openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 logger = logging.getLogger("agent")
@@ -34,19 +34,19 @@ class Assistant(Agent):
 
     # all functions annotated with @function_tool will be passed to the LLM when this
     # agent is active
-    @function_tool
-    async def lookup_weather(self, context: RunContext, location: str):
-        """Use this tool to look up current weather information in the given location.
+    # @function_tool
+    # async def lookup_weather(self, context: RunContext, location: str):
+    #     """Use this tool to look up current weather information in the given location.
 
-        If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
+    #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
 
-        Args:
-            location: The location to look up weather information for (e.g. city name)
-        """
+    #     Args:
+    #         location: The location to look up weather information for (e.g. city name)
+    #     """
 
-        logger.info(f"Looking up weather for {location}")
+    #     logger.info(f"Looking up weather for {location}")
 
-        return "sunny with a temperature of 70 degrees."
+    #     return "sunny with a temperature of 70 degrees."
 
 
 def prewarm(proc: JobProcess):
@@ -62,9 +62,14 @@ async def entrypoint(ctx: JobContext):
     # Set up a voice AI pipeline using OpenAI, Cartesia, Deepgram, and the LiveKit turn detector
     session = AgentSession(
         # any combination of STT, LLM, TTS, or realtime API can be used
-        llm=openai.LLM(model="gpt-4o-mini"),
-        stt=deepgram.STT(model="nova-3", language="multi"),
-        tts=cartesia.TTS(),
+        llm=openai.LLM.with_ollama(model="llama3:8b",base_url="http://localhost:11434/v1"),
+        stt=assemblyai.STT(),
+        tts=rime.TTS(
+            model="mist",
+            speaker="rainforest",
+            speed_alpha=0.9,
+            reduce_latency=True
+        ),
         # use LiveKit's turn detection model
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
