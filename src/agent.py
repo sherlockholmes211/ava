@@ -17,6 +17,7 @@ from livekit.agents.llm import function_tool
 from livekit.agents.voice import MetricsCollectedEvent
 from livekit.plugins import rime, assemblyai, noise_cancellation, openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
+from system_prompt import system_prompt
 
 logger = logging.getLogger("agent")
 
@@ -26,10 +27,7 @@ load_dotenv()
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions="""You are a helpful voice AI assistant.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation.
-            You are curious, friendly, and have a sense of humor.""",
+            instructions=system_prompt,
         )
 
     # all functions annotated with @function_tool will be passed to the LLM when this
