@@ -15,7 +15,7 @@ from livekit.agents import (
 )
 from livekit.agents.llm import function_tool
 from livekit.agents.voice import MetricsCollectedEvent
-from livekit.plugins import rime, assemblyai, noise_cancellation, openai, silero
+from livekit.plugins import cartesia, assemblyai, noise_cancellation, openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from system_prompt import system_prompt
 
@@ -27,7 +27,7 @@ load_dotenv()
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
-            instructions=system_prompt,
+            instructions=system_prompt["NODE_INTERVIEWER"],
         )
 
     # all functions annotated with @function_tool will be passed to the LLM when this
@@ -62,12 +62,11 @@ async def entrypoint(ctx: JobContext):
         # any combination of STT, LLM, TTS, or realtime API can be used
         llm=openai.LLM.with_ollama(model="llama3:8b",base_url="http://localhost:11434/v1"),
         stt=assemblyai.STT(),
-        tts=rime.TTS(
-            model="mist",
-            speaker="rainforest",
-            speed_alpha=0.9,
-            reduce_latency=True
-        ),
+        tts=cartesia.TTS(
+            model="sonic-2",
+            voice="f786b574-daa5-4673-aa0c-cbe3e8534c02",
+        )
+        ,
         # use LiveKit's turn detection model
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
